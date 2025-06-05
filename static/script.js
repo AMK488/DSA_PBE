@@ -25,6 +25,104 @@ function showNotification(message, isSuccess = true) {
     }, 3000);
 }
 
+function addCity() {
+    const city = document.getElementById("cityInput").value;
+    if (!city) {
+        showNotification("Please enter a city name", false);
+        return;
+    }
+
+    fetch(`${backendURL}/add_city`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: city })
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            showNotification(data.message, true);
+            document.getElementById("cityInput").value = "";
+            refreshGraph();
+            populateDropdowns();
+        } else {
+            showNotification(data.message, false);
+        }
+    });
+}
+
+function addRoad() {
+    const from = document.getElementById("fromInput").value;
+    const to = document.getElementById("toInput").value;
+    const weight = parseInt(document.getElementById("weightInput").value) || 1;
+
+    if (!from || !to) {
+        showNotification("Please select both cities", false);
+        return;
+    }
+
+    if (from === to) {
+        showNotification("Cannot add road from a city to itself", false);
+        return;
+    }
+
+    fetch(`${backendURL}/add_road`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from, to, weight })
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            showNotification(data.message, true);
+            document.getElementById("weightInput").value = "";
+            refreshGraph();
+            populateDropdowns();
+        } else {
+            showNotification(data.message, false);
+        }
+    });
+}
+
+function deleteCity() {
+    const city = document.getElementById("cityInput").value;
+    if (!city) {
+        showNotification("Please enter a city name", false);
+        return;
+    }
+    fetch(`${backendURL}/delete_city`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: city })
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            showNotification(data.message, true);
+            document.getElementById("cityInput").value = "";
+            refreshGraph();
+            populateDropdowns();
+        } else {
+            showNotification(data.message, false);
+        }
+    });
+}
+
+function deleteRoad() {
+    const from = document.getElementById("fromInput").value;
+    const to = document.getElementById("toInput").value;
+    if (!from || !to) {
+        showNotification("Please select both cities", false);
+        return;
+    }
+    fetch(`${backendURL}/delete_road`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ from, to })
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            showNotification(data.message, true);
+            refreshGraph();
+            populateDropdowns();
+        } else {
+            showNotification(data.message, false);
+        }
+    });
+}
+
 function findPath() {
     const start = document.getElementById("start").value;
     const end = document.getElementById("end").value;
@@ -61,8 +159,8 @@ function populateDropdowns() {
             const start = document.getElementById("start");
             const end = document.getElementById("end");
             
-            from.innerHTML = "";
-            to.innerHTML = "";
+            from.innerHTML = '<option value="">Select From</option>';
+            to.innerHTML = '<option value="">Select To</option>';
             
             cities.forEach(city => {
                 const opt1 = document.createElement("option");
@@ -147,101 +245,3 @@ document.addEventListener('DOMContentLoaded', function() {
     populateDropdowns();
     displayGraph();
 });
-
-function deleteCity() {
-    const city = document.getElementById("cityInput").value;
-    if (!city) {
-        showNotification("Please enter a city name", false);
-        return;
-    }
-    fetch(`${backendURL}/delete_city`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: city })
-    }).then(res => res.json()).then(data => {
-        if (data.success) {
-            showNotification(data.message, true);
-            document.getElementById("cityInput").value = "";
-            refreshGraph();
-            populateDropdowns();
-        } else {
-            showNotification(data.message, false);
-        }
-    });
-}
-
-function deleteRoad() {
-    const from = document.getElementById("fromInput").value;
-    const to = document.getElementById("toInput").value;
-    if (!from || !to) {
-        showNotification("Please select both cities", false);
-        return;
-    }
-    fetch(`${backendURL}/delete_road`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ from, to })
-    }).then(res => res.json()).then(data => {
-        if (data.success) {
-            showNotification(data.message, true);
-            refreshGraph();
-            populateDropdowns();
-        } else {
-            showNotification(data.message, false);
-        }
-    });
-}
-
-function addCity() {
-    const city = document.getElementById("cityInput").value;
-    if (!city) {
-        showNotification("Please enter a city name", false);
-        return;
-    }
-
-    fetch(`${backendURL}/add_city`, {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: city })
-    }).then(res => res.json()).then(data => {
-        if (data.success) {
-            showNotification(data.message, true);
-            document.getElementById("cityInput").value = "";
-            refreshGraph();
-            populateDropdowns();
-        } else {
-            showNotification(data.message, false);
-        }
-    });
-}
-
-function addRoad() {
-    const from = document.getElementById("fromInput").value;
-    const to = document.getElementById("toInput").value;
-    const weight = parseInt(document.getElementById("weightInput").value) || 1;
-
-    if (!from || !to) {
-        showNotification("Please select both cities", false);
-        return;
-    }
-
-    if (from === to) {
-        showNotification("Cannot add road from a city to itself", false);
-        return;
-    }
-
-    fetch(`${backendURL}/add_road`, {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from, to, weight })
-    }).then(res => res.json()).then(data => {
-        if (data.success) {
-            showNotification(data.message, true);
-            document.getElementById("weightInput").value = "";
-            refreshGraph();
-            populateDropdowns();
-        } else {
-            showNotification(data.message, false);
-        }
-    });
-}
