@@ -20,7 +20,7 @@ def homepage():
 
 @app.route('/add_city', methods=['POST'])
 def add_city():
-    data = request.get_json()
+    data = request.get_json() 
     city_name = data.get('name')
     if city_name:
         graph.add_city(city_name)
