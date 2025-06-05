@@ -4,49 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shortest Path Finder</title>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
-<body style="font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px;">
-    <h1 style="text-align: center; color: #333;">Shortest Route Finder</h1>
+<body>
+    <h1>Shortest Route Finder</h1>
 
-    <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
-        <h3>City Management</h3>
-        <input type="text" id="cityInput" placeholder="City name" style="padding: 8px; margin-right: 10px;">
-        <button onclick="addCity()" style="padding: 8px 15px; margin-right: 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">Add City</button>
-        <button onclick="deleteCity()" style="padding: 8px 15px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer;">Delete City</button>
+    <div>
+        <input type="text" id="cityInput" placeholder="City name">
+        <button onclick="addCity()">Add City</button>
+        <button onclick="deleteCity()">Delete City</button>
     </div>
 
-    <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
-        <h3>Road Management</h3>
-        <select id="fromInput" style="padding: 8px; margin-right: 10px; min-width: 120px;">
-            <option value="">Select From</option>
-        </select>
-        <select id="toInput" style="padding: 8px; margin-right: 10px; min-width: 120px;">
-            <option value="">Select To</option>
-        </select>
-        <input type="number" id="weightInput" placeholder="Weight" min="1" style="padding: 8px; margin-right: 10px; width: 80px;">
-        <button onclick="addRoad()" style="padding: 8px 15px; margin-right: 10px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer;">Add Road</button>
-        <button onclick="deleteRoad()" style="padding: 8px 15px; background: #FF9800; color: white; border: none; border-radius: 3px; cursor: pointer;">Delete Road</button>
+    <div>
+        <select id="fromInput" placeholder="From"></select>
+        <select id="toInput" placeholder="To"></select>
+        <input type="number" id="weightInput" placeholder="Weight">
+        <button onclick="addRoad()">Add Road</button>
+        <button onclick="deleteRoad()">Delete Road</button>
     </div>
 
-    <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
-        <h3>Find Shortest Path</h3>
-        <input id="start" placeholder="Start City" list="start-cities" style="padding: 8px; margin-right: 10px; min-width: 120px;">
-        <input id="end" placeholder="End City" list="end-cities" style="padding: 8px; margin-right: 10px; min-width: 120px;">
-        <select id="algo" style="padding: 8px; margin-right: 10px;">
+    <div>
+        <input id="start" placeholder="Start">
+        <input id="end" placeholder="End">
+        <select id="algo">
             <option>Dijkstra</option>
             <option>BFS</option>
         </select>
-        <button onclick="findPath()" style="padding: 8px 15px; background: #9C27B0; color: white; border: none; border-radius: 3px; cursor: pointer;">Find Path</button>
+        <button onclick="findPath()">Find Path</button>
     </div>
 
-    <div style="display: flex; gap: 20px;">
-        <div style="flex: 1;">
-            <div id="output" style="padding: 15px; border: 1px solid #ddd; border-radius: 5px; min-height: 50px; background: #f9f9f9;"></div>
-        </div>
-        <div style="flex: 1;">
-            <div id="graphDisplay" style="padding: 15px; border: 1px solid #ddd; border-radius: 5px; min-height: 200px; background: #f9f9f9; overflow-y: auto; max-height: 400px;"></div>
-        </div>
-    </div>
+    <div id="output"></div>
 </body>
 </html>
