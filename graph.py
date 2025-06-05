@@ -25,43 +25,68 @@ class Graph:
       self.adj[to_city] = [n for n in self.adj[to_city] if n[0] != from_city]
 
   def dijkstra(self, start, end):
+      if start not in self.adj or end not in self.adj:
+          return [], float('inf')
+      
+      if start == end:
+          return [start], 0
+          
       dist = {node: float('inf') for node in self.adj}
       dist[start] = 0
       prev = {}
       heap = [(0, start)]
+      visited = set()
 
       while heap:
           d, u = heapq.heappop(heap)
+          
+          if u in visited:
+              continue
+              
+          visited.add(u)
+          
           if u == end:
               break
+              
           for v, w in self.adj.get(u, []):
-              alt = d + w
-              if alt < dist[v]:
-                  dist[v] = alt
-                  prev[v] = u
-                  heapq.heappush(heap, (alt, v))
+              if v not in visited:
+                  alt = d + w
+                  if alt < dist[v]:
+                      dist[v] = alt
+                      prev[v] = u
+                      heapq.heappush(heap, (alt, v))
 
+      # Reconstruct path
+      if dist[end] == float('inf'):
+          return [], float('inf')
+          
       path = []
       curr = end
       while curr in prev:
           path.insert(0, curr)
           curr = prev[curr]
-      if dist[end] != float('inf'):
-          path.insert(0, start)
+      path.insert(0, start)
       return path, dist[end]
 
   def bfs(self, start, end):
-      visited = set()
-      queue = deque([(start, [start])])
+      if start not in self.adj or end not in self.adj:
+          return [], float('inf')
+      
+      if start == end:
+          return [start], 0
+          
+      visited = set([start])
+      queue = deque([(start, [start], 0)])
 
       while queue:
-          current, path = queue.popleft()
-          if current == end:
-              return path, len(path) - 1
-          for neighbor, _ in self.adj.get(current, []):
+          current, path, distance = queue.popleft()
+          
+          for neighbor, weight in self.adj.get(current, []):
+              if neighbor == end:
+                  return path + [neighbor], distance + weight
               if neighbor not in visited:
                   visited.add(neighbor)
-                  queue.append((neighbor, path + [neighbor]))
+                  queue.append((neighbor, path + [neighbor], distance + weight))
       return [], float('inf')
 
   def save_to_file(self, filename):

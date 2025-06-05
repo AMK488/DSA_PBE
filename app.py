@@ -63,6 +63,10 @@ def delete_road():
 def all_cities():
     return jsonify(list(graph.adj.keys()))
 
+@app.route('/get_graph')
+def get_graph():
+    return jsonify(graph.adj)
+
 @app.route('/find_path', methods=['POST'])
 def find_path():
     data = request.get_json()
@@ -71,6 +75,12 @@ def find_path():
     algo = data.get('algo', 'Dijkstra')
     
     if start and end:
+        # Check if both cities exist in the graph
+        if start not in graph.adj:
+            return jsonify({'success': False, 'message': f'Start city "{start}" not found'})
+        if end not in graph.adj:
+            return jsonify({'success': False, 'message': f'End city "{end}" not found'})
+            
         if algo.lower() == 'dijkstra':
             path, distance = graph.dijkstra(start, end)
         else:
