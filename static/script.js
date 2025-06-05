@@ -134,10 +134,19 @@ function formatGraphDisplay(graphData) {
     return display;
 }
 
-window.onload = () => {
-    refreshGraph();
+// Make sure all functions are available globally
+window.addCity = addCity;
+window.addRoad = addRoad;
+window.deleteCity = deleteCity;
+window.deleteRoad = deleteRoad;
+window.findPath = findPath;
+window.refreshGraph = refreshGraph;
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
     populateDropdowns();
-};
+    displayGraph();
+});
 
 function deleteCity() {
     const city = document.getElementById("cityInput").value;
