@@ -4,8 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shortest Path Finder</title>
+    <script src="static\script.js" defer></script>
+    <link rel="static\stylesheet" href="style.css">
 </head>
 <body>
     <h1>Shortest Route Finder</h1>
+
+    <div>
+        <input type="text" id="cityInput" placeholder="City name">
+        <button onclick="addCity()">Add City</button>
+        <button onclick="deleteCity()">Delete City</button>
+    </div>
+
+    <div>
+        <select id="fromInput" placeholder="From"></select>
+        <select id="toInput" placeholder="To"></select>
+        <input type="number" id="weightInput" placeholder="Weight">
+        <button onclick="addRoad()">Add Road</button>
+        <button onclick="deleteRoad()">Delete Road</button>
+    </div>
+
+    <div>
+        <input id="start" placeholder="Start">
+        <input id="end" placeholder="End">
+        <select id="algo">
+            <option>Dijkstra</option>
+            <option>BFS</option>
+        </select>
+        <button onclick="findPath()">Find Path</button>
+    </div>
+
+    <div id="output"></div>
 </body>
 </html>
