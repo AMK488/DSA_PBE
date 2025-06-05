@@ -1,3 +1,7 @@
+import heapq
+import json
+from collections import deque
+
 class Graph:
   def __init__(self):
       self.adj = {}  # {city: [(neighbor, weight)]}
