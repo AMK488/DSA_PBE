@@ -7,8 +7,8 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+graph = Graph()
+
 
 
 @app.route('/')
@@ -19,7 +19,6 @@ def index():
 def homepage():
     return render_template('home.html')
 
-graph = Graph()
 
 @app.route('/add_city', methods=['POST'])
 def add_city():
@@ -63,4 +62,6 @@ def find_path():
         return jsonify({'path': path, 'distance': distance})
     return jsonify({'path': [], 'distance': float('inf')})
 
-    
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=5000, debug=True)
+

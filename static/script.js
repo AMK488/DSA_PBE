@@ -75,7 +75,6 @@ window.onload = () => {
 };
 
 
-
 function addCity() {
     const city = document.getElementById("cityInput").value;
     if (!city) {
@@ -160,10 +159,12 @@ window.onload = () => {
 function findPath() {
     const start = document.getElementById("start").value;
     const end = document.getElementById("end").value;
+    const algo = document.getElementById("algo").value;
+
     fetch("/find_path", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ start, end })
+        body: JSON.stringify({ start, end, algo })
     }).then(res => res.json()).then(data => {
         if (data.path.length > 0) {
             const out = `Path: ${data.path.join(" → ")}<br>Distance: ${data.distance}`;
