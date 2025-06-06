@@ -7,8 +7,9 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-# Initialize the graph
-graph = Graph()
+if __name__ == '__main__':
+app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 @app.route('/')
 def index():
@@ -17,6 +18,8 @@ def index():
 @app.route('/home')
 def homepage():
     return render_template('home.html')
+
+graph = Graph()
 
 @app.route('/add_city', methods=['POST'])
 def add_city():
@@ -27,37 +30,18 @@ def add_city():
         return jsonify({'success': True, 'message': f'City {city_name} added successfully!'})
     return jsonify({'success': False, 'message': 'Invalid city name'})
 
-@app.route('/delete_city', methods=['POST'])
-def delete_city():
-    data = request.get_json()
-    city_name = data.get('name')
-    if city_name and city_name in graph.adj:
-        graph.remove_city(city_name)
-        return jsonify({'success': True, 'message': f'City {city_name} deleted successfully!'})
-    return jsonify({'success': False, 'message': 'City not found'})
-
 @app.route('/add_road', methods=['POST'])
 def add_road():
     data = request.get_json()
     from_city = data.get('from')
     to_city = data.get('to')
     weight = int(data.get('weight', 1))
-    
+
     if from_city and to_city:
         graph.add_road(from_city, to_city, weight)
         return jsonify({'success': True, 'message': f'Road added between {from_city} and {to_city}'})
-    return jsonify({'success': False, 'message': 'Invalid city names'})
+        return jsonify({'success': False, 'message': 'Invalid city names'})
 
-@app.route('/delete_road', methods=['POST'])
-def delete_road():
-    data = request.get_json()
-    from_city = data.get('from')
-    to_city = data.get('to')
-    
-    if from_city and to_city:
-        graph.remove_road(from_city, to_city)
-        return jsonify({'success': True, 'message': f'Road deleted between {from_city} and {to_city}'})
-    return jsonify({'success': False, 'message': 'Invalid city names'})
 
 @app.route('/all_cities')
 def all_cities():
@@ -79,5 +63,4 @@ def find_path():
         return jsonify({'path': path, 'distance': distance})
     return jsonify({'path': [], 'distance': float('inf')})
 
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    

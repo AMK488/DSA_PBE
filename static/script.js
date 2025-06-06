@@ -144,12 +144,10 @@ function addRoad() {
     const from = document.getElementById("fromInput").value;
     const to = document.getElementById("toInput").value;
     const weight = document.getElementById("weightInput").value || 1;
-
     if (!from || !to) {
         showNotification("Please select both cities", false);
         return;
     }
-
     fetch("/add_road", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
@@ -157,9 +155,62 @@ function addRoad() {
     }).then(res => res.json()).then(data => {
         if (data.success) {
             showNotification(data.message, true);
-            refreshGraph();
+            refreshGraph(); 
         } else {
             showNotification(data.message, false);
+        }
+    });
+}
+
+function all_cities(){
+    fetch('/all_cities')
+      .then(response => response.json())
+      .then(cities => {
+        const fromInput = document.getElementById('fromInput');
+        const toInput = document.getElementById('toInput');
+        cities.forEach(city => {
+          const option = document.createElement('option');
+          option.value = city;
+          option.text = city;
+          fromInput.appendChild(option);
+          toInput.appendChild(option);
+        });
+      });
+}
+function populateInputBoxes() {
+    fetch("/all_cities")
+        .then(res => res.json())
+        .then(cities => {
+            const startInput = document.getElementById("start");
+            const endInput = document.getElementById("end");
+            startInput.innerHTML = "";
+            endInput.innerHTML = "";
+            cities.forEach(city => {
+                const opt1 = document.createElement("option");
+                const opt2 = document.createElement("option");
+                opt1.value = opt2.value = city;
+                opt1.text = opt2.text = city;
+                startInput.appendChild(opt1);
+                endInput.appendChild(opt2);
+            });
+        });
+}
+window.onload = () => {
+    populateInputBoxes();
+};
+function findPath() {
+    const start = document.getElementById("start").value;
+    const end = document.getElementById("end").value;
+    fetch("/find_path", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ start, end })
+    }).then(res => res.json()).then(data => {
+        if (data.path.length > 0) {
+            const out = `Path: ${data.path.join(" → ")}<br>Distance: ${data.distance}`;
+            document.getElementById("output").innerHTML = out;
+        } else {
+            document.getElementById("output").innerHTML = "No path found!";
         }
     });
 }
