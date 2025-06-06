@@ -44,13 +44,18 @@ function findPath() {
     });
 }
 
-function populateDropdowns() {
+function populateAllDropdowns() {
     fetch("/all_cities")
         .then(res => res.json())
         .then(cities => {
             const from = document.getElementById("fromInput");
             const to = document.getElementById("toInput");
-            from.innerHTML = "";
+            const startInput = document.getElementById("start");
+            const endInput = document.getElementById("end");
+            [fromInput, toInput, startInput, endInput].forEach(dropdown => {
+                const currentValue = dropdown.value;
+                dropdown.innerHTML = "";
+            
             to.innerHTML = "";
             cities.forEach(city => {
                 const opt1 = document.createElement("option");
@@ -62,17 +67,43 @@ function populateDropdowns() {
             });
         });
 }
+function populateAllDropdowns() {
+    fetch("/all_cities")
+        .then(res => res.json())
+        .then(cities => {
+            // Populate from/to dropdowns for adding roads
+            const fromInput = document.getElementById("fromInput");
+            const toInput = document.getElementById("toInput");
 
-function refreshGraph() {
-    // This function can be used to refresh any graph visualization
-    // For now, it just refreshes the dropdowns
-    populateDropdowns();
+            // Populate start/end dropdowns for finding paths
+            
+
+            // Clear all dropdowns
+            [fromInput, toInput, startInput, endInput].forEach(dropdown => {
+                const currentValue = dropdown.value;
+                dropdown.innerHTML = "";
+                if (dropdown === startInput || dropdown === endInput) {
+                    const defaultOption = document.createElement("option");
+                    defaultOption.value = "";
+                    defaultOption.text = dropdown === startInput ? "Select Start City" : "Select End City";
+                    dropdown.appendChild(defaultOption);
+                                }
+
+                                // Add city options
+                cities.forEach(city => {
+                    const option = document.createElement("option");
+                    option.value = city;
+                    option.text = city;
+                    dropdown.appendChild(option);
+                                });
+
+                                // Restore previous selection if it still exists
+                if (cities.includes(currentValue)) {
+                    dropdown.value = currentValue;
+                }
+            });
+        });
 }
-
-window.onload = () => {
-    refreshGraph();
-    populateDropdowns();
-};
 
 
 function addCity() {
@@ -81,7 +112,6 @@ function addCity() {
         showNotification("Please enter a city name", false);
         return;
     }
-
     fetch("/add_city", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
@@ -90,8 +120,7 @@ function addCity() {
         if (data.success) {
             showNotification(data.message, true);
             document.getElementById("cityInput").value = "";
-            refreshGraph();
-            populateDropdowns();
+            populateAllDropdowns();
         } else {
             showNotification(data.message, false);
         }
@@ -135,26 +164,6 @@ function all_cities(){
         });
       });
 }
-function populateInputBoxes() {
-    fetch("/all_cities")
-        .then(res => res.json())
-        .then(cities => {
-            const startInput = document.getElementById("start");
-            const endInput = document.getElementById("end");
-            startInput.innerHTML = "";
-            endInput.innerHTML = "";
-            cities.forEach(city => {
-                const opt1 = document.createElement("option");
-                const opt2 = document.createElement("option");
-                opt1.value = opt2.value = city;
-                opt1.text = opt2.text = city;
-                startInput.appendChild(opt1);
-                endInput.appendChild(opt2);
-            });
-        });
-}
-window.onload = () => {
-    populateInputBoxes();
 };
 function findPath() {
     const start = document.getElementById("start").value;
@@ -174,3 +183,7 @@ function findPath() {
         }
     });
 }
+
+window.onload = () => {
+    populateAllDropdowns();
+};
