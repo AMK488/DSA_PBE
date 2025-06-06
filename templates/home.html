@@ -34,7 +34,19 @@
         </select>
         <button onclick="findPath()">Find Path</button>
     </div>
-
+    <div>
+        <button onclick="window.location.href='/visualize_graph'">Visualize Graph</button>
+    </div>
+    <div>
+        <img id="graphImage" src="static/graph.png" alt="Graph Visualization" style="display:none;" />
+    </div>
+    <script>
+        // Show the graph image if it exists
+        window.onload = function() {
+            const img = document.getElementById('graphImage');
+            img.style.display = 'block';  // Show the graph when the page loads
+        };
+    </script>
     <div id="output"></div>
 </body>
 </html>

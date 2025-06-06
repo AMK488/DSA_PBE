@@ -3,6 +3,9 @@ from flask import Flask, render_template, jsonify, redirect, url_for, request
 from flask_cors import CORS
 from graph import Graph
 import json
+import matplotlib.pyplot as plt
+import networkx as nx
+
 
 app = Flask(__name__)
 CORS(app)
@@ -61,6 +64,25 @@ def find_path():
         
         return jsonify({'path': path, 'distance': distance})
     return jsonify({'path': [], 'distance': float('inf')})
+
+
+@app.route('/visualize_graph')
+def visualize_graph():
+    G = nx.Graph()
+    # Add edges from the graph data
+    for city, roads in graph.adj.items():
+        for neighbor, weight in roads:
+            G.add_edge(city, neighbor, weight=weight)
+    # Draw the graph
+    pos = nx.spring_layout(G)
+    edge_labels = nx.get_edge_attributes(G, 'weight')
+    nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=1500, font_size=10)
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+    # Save the graph as an image
+    plt.title("City Graph Visualization")
+    plt.savefig('static/graph.png')  # Save to static folder
+    plt.close()
+    return redirect(url_for('homepage'))
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)

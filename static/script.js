@@ -25,87 +25,6 @@ function showNotification(message, isSuccess = true) {
     }, 3000);
 }
 
-function findPath() {
-    const start = document.getElementById("start").value;
-    const end = document.getElementById("end").value;
-    const algo = document.getElementById("algo").value;
-
-    fetch(`${backendURL}/find_path`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({start, end, algo})
-    }).then(res => res.json()).then(data => {
-        if (data.path.length > 0) {
-            const out = `Path: ${data.path.join(" → ")}<br>Distance: ${data.distance}`;
-            document.getElementById("output").innerHTML = out;
-        } else {
-            document.getElementById("output").innerHTML = "No path found!";
-        }
-    });
-}
-
-function populateAllDropdowns() {
-    fetch("/all_cities")
-        .then(res => res.json())
-        .then(cities => {
-            const from = document.getElementById("fromInput");
-            const to = document.getElementById("toInput");
-            const startInput = document.getElementById("start");
-            const endInput = document.getElementById("end");
-            [fromInput, toInput, startInput, endInput].forEach(dropdown => {
-                const currentValue = dropdown.value;
-                dropdown.innerHTML = "";
-            
-            to.innerHTML = "";
-            cities.forEach(city => {
-                const opt1 = document.createElement("option");
-                const opt2 = document.createElement("option");
-                opt1.value = opt2.value = city;
-                opt1.text = opt2.text = city;
-                from.appendChild(opt1);
-                to.appendChild(opt2);
-            });
-        });
-}
-function populateAllDropdowns() {
-    fetch("/all_cities")
-        .then(res => res.json())
-        .then(cities => {
-            // Populate from/to dropdowns for adding roads
-            const fromInput = document.getElementById("fromInput");
-            const toInput = document.getElementById("toInput");
-
-            // Populate start/end dropdowns for finding paths
-            
-
-            // Clear all dropdowns
-            [fromInput, toInput, startInput, endInput].forEach(dropdown => {
-                const currentValue = dropdown.value;
-                dropdown.innerHTML = "";
-                if (dropdown === startInput || dropdown === endInput) {
-                    const defaultOption = document.createElement("option");
-                    defaultOption.value = "";
-                    defaultOption.text = dropdown === startInput ? "Select Start City" : "Select End City";
-                    dropdown.appendChild(defaultOption);
-                                }
-
-                                // Add city options
-                cities.forEach(city => {
-                    const option = document.createElement("option");
-                    option.value = city;
-                    option.text = city;
-                    dropdown.appendChild(option);
-                                });
-
-                                // Restore previous selection if it still exists
-                if (cities.includes(currentValue)) {
-                    dropdown.value = currentValue;
-                }
-            });
-        });
-}
-
-
 function addCity() {
     const city = document.getElementById("cityInput").value;
     if (!city) {
@@ -126,6 +45,65 @@ function addCity() {
         }
     });
 }
+
+function findPath() {
+    const start = document.getElementById("start").value;
+    const end = document.getElementById("end").value;
+    const algo = document.getElementById("algo").value;
+
+    fetch(`${backendURL}/find_path`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({start, end, algo})
+    }).then(res => res.json()).then(data => {
+        if (data.path.length > 0) {
+            const out = `Path: ${data.path.join(" → ")}<br>Distance: ${data.distance}`;
+            document.getElementById("output").innerHTML = out;
+        } else {
+            document.getElementById("output").innerHTML = "No path found!";
+        }
+    });
+}
+
+
+function populateAllDropdowns() {
+    fetch("/all_cities")
+        .then(res => res.json())
+        .then(cities => {
+            const from = document.getElementById("fromInput");
+            const to = document.getElementById("toInput");
+            const startInput = document.getElementById("start");
+            const endInput = document.getElementById("end");
+            [fromInput, toInput, startInput, endInput].forEach(dropdown => {
+                const currentValue = dropdown.value;
+                dropdown.innerHTML = "";
+                if (dropdown === startInput || dropdown === endInput) {
+                    const defaultOption = document.createElement("option");
+                    defaultOption.value = "";
+                    defaultOption.text = dropdown === startInput ? "Select Start City" : "Select End City";
+                    dropdown.appendChild(defaultOption);
+                }
+
+                                // Add city options
+                cities.forEach(city => {
+                    const option = document.createElement("option");
+                    option.value = city;
+                    option.text = city;
+                    dropdown.appendChild(option);
+                });
+
+                                // Restore previous selection if it still exists
+                if (cities.includes(currentValue)) {
+                    dropdown.value = currentValue;
+                }
+            });
+        });
+}
+window.onload = () => {
+    populateAllDropdowns();
+};
+
+
 
 function addRoad() {
     const from = document.getElementById("fromInput").value;
@@ -149,7 +127,7 @@ function addRoad() {
     });
 }
 
-function all_cities(){
+function all_cities() {
     fetch('/all_cities')
       .then(response => response.json())
       .then(cities => {
@@ -164,7 +142,8 @@ function all_cities(){
         });
       });
 }
-};
+
+
 function findPath() {
     const start = document.getElementById("start").value;
     const end = document.getElementById("end").value;
@@ -184,6 +163,3 @@ function findPath() {
     });
 }
 
-window.onload = () => {
-    populateAllDropdowns();
-};
