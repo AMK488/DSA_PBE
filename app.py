@@ -8,14 +8,14 @@ app = Flask(__name__)
 CORS(app)
 
 if __name__ == '__main__':
-app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
 
 
 @app.route('/')
 def index():
     return redirect(url_for('homepage'))
 
-@app.route('/home')
+@app.route('/homepage')
 def homepage():
     return render_template('home.html')
 
@@ -40,7 +40,7 @@ def add_road():
     if from_city and to_city:
         graph.add_road(from_city, to_city, weight)
         return jsonify({'success': True, 'message': f'Road added between {from_city} and {to_city}'})
-        return jsonify({'success': False, 'message': 'Invalid city names'})
+    return jsonify({'success': False, 'message': 'Invalid city names'})
 
 
 @app.route('/all_cities')

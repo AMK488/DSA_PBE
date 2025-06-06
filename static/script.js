@@ -74,48 +74,7 @@ window.onload = () => {
     populateDropdowns();
 };
 
-function deleteCity() {
-    const city = document.getElementById("cityInput").value;
-    if (!city) {
-        showNotification("Please enter a city name", false);
-        return;
-    }
-    fetch("/delete_city", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: city })
-    }).then(res => res.json()).then(data => {
-        if (data.success) {
-            showNotification(data.message, true);
-            document.getElementById("cityInput").value = "";
-            refreshGraph();
-            populateDropdowns();
-        } else {
-            showNotification(data.message, false);
-        }
-    });
-}
 
-function deleteRoad() {
-    const from = document.getElementById("fromInput").value;
-    const to = document.getElementById("toInput").value;
-    if (!from || !to) {
-        showNotification("Please select both cities", false);
-        return;
-    }
-    fetch("/delete_road", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ from, to })
-    }).then(res => res.json()).then(data => {
-        if (data.success) {
-            showNotification(data.message, true);
-            refreshGraph();
-        } else {
-            showNotification(data.message, false);
-        }
-    });
-}
 
 function addCity() {
     const city = document.getElementById("cityInput").value;
