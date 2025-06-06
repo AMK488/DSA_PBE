@@ -1,18 +1,12 @@
-
 from flask import Flask, render_template, jsonify, redirect, url_for, request
 from flask_cors import CORS
 from graph import Graph
 import json
-import matplotlib.pyplot as plt
-import networkx as nx
-
 
 app = Flask(__name__)
 CORS(app)
 
 graph = Graph()
-
-
 
 @app.route('/')
 def index():
@@ -21,7 +15,6 @@ def index():
 @app.route('/homepage')
 def homepage():
     return render_template('home.html')
-
 
 @app.route('/add_city', methods=['POST'])
 def add_city():
@@ -44,10 +37,35 @@ def add_road():
         return jsonify({'success': True, 'message': f'Road added between {from_city} and {to_city}'})
     return jsonify({'success': False, 'message': 'Invalid city names'})
 
-
 @app.route('/all_cities')
 def all_cities():
     return jsonify(list(graph.adj.keys()))
+
+@app.route('/graph_data')
+def graph_data():
+    """Return graph data in D3.js compatible format"""
+    nodes = []
+    links = []
+
+    # Create nodes
+    for city in graph.adj.keys():
+        nodes.append({"id": city})
+
+    # Create links (avoid duplicates)
+    processed_pairs = set()
+    for city, neighbors in graph.adj.items():
+        for neighbor, weight in neighbors:
+            # Create a sorted tuple to avoid duplicate edges
+            pair = tuple(sorted([city, neighbor]))
+            if pair not in processed_pairs:
+                links.append({
+                    "source": city,
+                    "target": neighbor,
+                    "weight": weight
+                })
+                processed_pairs.add(pair)
+
+    return jsonify({"nodes": nodes, "links": links})
 
 @app.route('/find_path', methods=['POST'])
 def find_path():
@@ -55,35 +73,37 @@ def find_path():
     start = data.get('start')
     end = data.get('end')
     algo = data.get('algo', 'Dijkstra')
-    
+
     if start and end:
         if algo.lower() == 'dijkstra':
             path, distance = graph.dijkstra(start, end)
         else:
             path, distance = graph.bfs(start, end)
-        
+
         return jsonify({'path': path, 'distance': distance})
     return jsonify({'path': [], 'distance': float('inf')})
 
+@app.route('/remove_city', methods=['POST'])
+def remove_city():
+    """Remove a city and all its connections"""
+    data = request.get_json()
+    city_name = data.get('name')
+    if city_name and city_name in graph.adj:
+        graph.remove_city(city_name)
+        return jsonify({'success': True, 'message': f'City {city_name} removed successfully!'})
+    return jsonify({'success': False, 'message': 'City not found'})
 
-@app.route('/visualize_graph')
-def visualize_graph():
-    G = nx.Graph()
-    # Add edges from the graph data
-    for city, roads in graph.adj.items():
-        for neighbor, weight in roads:
-            G.add_edge(city, neighbor, weight=weight)
-    # Draw the graph
-    pos = nx.spring_layout(G)
-    edge_labels = nx.get_edge_attributes(G, 'weight')
-    nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=1500, font_size=10)
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-    # Save the graph as an image
-    plt.title("City Graph Visualization")
-    plt.savefig('static/graph.png')  # Save to static folder
-    plt.close()
-    return redirect(url_for('homepage'))
+@app.route('/remove_road', methods=['POST'])
+def remove_road():
+    """Remove a road between two cities"""
+    data = request.get_json()
+    from_city = data.get('from')
+    to_city = data.get('to')
+
+    if from_city and to_city:
+        graph.remove_road(from_city, to_city)
+        return jsonify({'success': True, 'message': f'Road removed between {from_city} and {to_city}'})
+    return jsonify({'success': False, 'message': 'Invalid city names'})
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
-

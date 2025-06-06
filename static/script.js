@@ -40,27 +40,9 @@ function addCity() {
             showNotification(data.message, true);
             document.getElementById("cityInput").value = "";
             populateAllDropdowns();
+            visualizeGraph();
         } else {
             showNotification(data.message, false);
-        }
-    });
-}
-
-function findPath() {
-    const start = document.getElementById("start").value;
-    const end = document.getElementById("end").value;
-    const algo = document.getElementById("algo").value;
-
-    fetch(`${backendURL}/find_path`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({start, end, algo})
-    }).then(res => res.json()).then(data => {
-        if (data.path.length > 0) {
-            const out = `Path: ${data.path.join(" → ")}<br>Distance: ${data.distance}`;
-            document.getElementById("output").innerHTML = out;
-        } else {
-            document.getElementById("output").innerHTML = "No path found!";
         }
     });
 }
@@ -101,6 +83,7 @@ function populateAllDropdowns() {
 }
 window.onload = () => {
     populateAllDropdowns();
+    visualizeGraph();
 };
 
 
@@ -120,7 +103,7 @@ function addRoad() {
     }).then(res => res.json()).then(data => {
         if (data.success) {
             showNotification(data.message, true);
-            refreshGraph(); 
+            visualizeGraph();
         } else {
             showNotification(data.message, false);
         }
@@ -143,6 +126,24 @@ function all_cities() {
       });
 }
 
+function findPath() {
+    const start = document.getElementById("start").value;
+    const end = document.getElementById("end").value;
+    const algo = document.getElementById("algo").value;
+
+    fetch(`${backendURL}/find_path`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({start, end, algo})
+    }).then(res => res.json()).then(data => {
+        if (data.path.length > 0) {
+            const out = `Path: ${data.path.join(" → ")}<br>Distance: ${data.distance}`;
+            document.getElementById("output").innerHTML = out;
+        } else {
+            document.getElementById("output").innerHTML = "No path found!";
+        }
+    });
+}
 
 function findPath() {
     const start = document.getElementById("start").value;
@@ -163,3 +164,74 @@ function findPath() {
     });
 }
 
+function visualizeGraph() {
+    fetch("/visualize_graph")
+        .then(response => response.json())
+        .then(data => {
+            const nodes = data.nodes;
+            const edges = data.edges;
+            drawGraph(nodes, edges);
+        });
+}
+function dragstarted(event, d) {
+    d3.select(this).raise().classed("active", true);
+}
+function dragged(event, d) {
+    d3.select(this)
+        .attr("cx", d.x = event.x)
+        .attr("cy", d.y = event.y);
+}
+function dragended(event, d) {
+    d3.select(this).classed("active", false);
+}
+function drawGraph(nodes, edges) {
+    // Clear previous graph
+    d3.select("#graph").selectAll("*").remove();
+
+    // Create a D3 force simulation
+    const svg = d3.select("#graph").append("svg")
+        .attr("width", 600)
+        .attr("height", 400);
+
+    const simulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink().id(d => d.id).distance(50))
+        .force("charge", d3.forceManyBody().strength(-100))
+        .force("center", d3.forceCenter(300, 200));
+
+    const link = svg.append("g")
+        .attr("class", "links")
+        .selectAll("line")
+        .data(edges)
+        .enter().append("line")
+        .attr("stroke-width", d => d[2]) // Use weight as stroke width
+        .attr("stroke", "gray");
+
+    const node = svg.append("g")
+        .attr("class", "nodes")
+        .selectAll("circle")
+        .data(nodes)
+        .enter().append("circle")
+        .attr("r", 5)
+        .attr("fill", "blue")
+        .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended));
+
+    node.append("title")
+        .text(d => d.id);
+
+    simulation
+        .nodes(nodes)
+        .on("tick", () => {
+            link.attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node.attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+        });
+
+    simulation.force("link").links(edges);
+}
